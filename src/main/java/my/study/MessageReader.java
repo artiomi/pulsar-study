@@ -23,7 +23,7 @@ public class MessageReader {
 
   public void read() {
     ReaderBuilder<String> readerBuilder = pulsarClient.newReader(Schema.STRING)
-        .topic(Main.TOPIC_NAME)
+        .topic(Main.NON_PART_TOPIC_NAME)
         .startMessageId(MessageId.earliest)
         .subscriptionName("my-reader");
     try (Reader<String> reader = readerBuilder.create()) {

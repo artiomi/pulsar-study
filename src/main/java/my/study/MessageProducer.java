@@ -18,11 +18,11 @@ public class MessageProducer {
     this.pulsarClient = pulsarClient;
   }
 
-  public void produce() {
+  public void produce(String topicName, String message) {
     ProducerBuilder<String> producerBuilder = pulsarClient.newProducer(Schema.STRING)
-        .topic(Main.TOPIC_NAME);
+        .topic(topicName);
     try (Producer<String> producer = producerBuilder.create()) {
-      MessageId messageId = producer.send("My message");
+      MessageId messageId = producer.send(message);
       log.info("Message produced:{}", messageId);
     } catch (PulsarClientException e) {
       throw new RuntimeException(e);

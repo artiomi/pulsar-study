@@ -1,6 +1,6 @@
 package my.study;
 
-import static my.study.Main.TOPIC_NAME;
+import static my.study.Main.NON_PART_TOPIC_NAME;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +23,7 @@ public class MessageConsumer {
 
   public void consume() {
     ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
-        .topic(TOPIC_NAME)
+        .topic(NON_PART_TOPIC_NAME)
         .subscriptionName("my-subscription");
     try (Consumer<String> consumer = consumerBuilder.subscribe()) {
       while (true) {

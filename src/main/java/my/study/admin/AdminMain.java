@@ -22,26 +22,27 @@ public class AdminMain {
 //      adminClient.tenants().getTenants().forEach(t -> log.info("Defined tenant: {}", t));
 //      adminClient.namespaces().getNamespaces("study").forEach(n -> log.info("Namespace in tenant `study`: {}", n));
 
-      nonPartitionedTopicsDetails(adminClient);
-//      partitionedTopicInfo(adminClient);
+//      nonPartitionedTopicsInfo(adminClient);
+      partitionedTopicInfo(adminClient);
 
     }
     log.info("End.");
   }
 
   private static void partitionedTopicInfo(PulsarAdmin adminClient) throws PulsarAdminException {
-    String partitionedTopic = TOPIC_NAME + "_partitioned";
+    String partitionedTopic ="persistent://study/home/first_topic";
 //    adminClient.topics().createPartitionedTopic(partitionedTopic, 5);
-    adminClient.topics().getList("study/home")
-        .forEach(t -> log.info("Topic in namespace `study/home`: {}", t));
+    adminClient.topics().getPartitionedTopicList("study/home")
+        .forEach(t -> log.info("Partitioned topic in namespace `study/home`: {}", t));
 
     PartitionedTopicStats topicStats = adminClient.topics().getPartitionedStats(partitionedTopic, false);
     log.info("Topic [{}] stats:{}", partitionedTopic, topicStats);
   }
 
-  private static void nonPartitionedTopicsDetails(PulsarAdmin adminClient) throws PulsarAdminException {
+  private static void nonPartitionedTopicsInfo(PulsarAdmin adminClient) throws PulsarAdminException {
     adminClient.topics().getList("study/home")
-        .forEach(t -> log.info("Topic in namespace `study/home`: {}", t));
+        .forEach(t -> log.info("Non Partitioned topic in namespace `study/home`: {}", t));
+//    adminClient.topics().createNonPartitionedTopic(TOPIC_NAME);
 
     TopicStats topicStats = adminClient.topics().getStats(TOPIC_NAME,
         GetStatsOptions.builder()

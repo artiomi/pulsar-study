@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 
 public class Main {
 
-  public static final String TOPIC_NAME = "persistent://study/home/my-topic";
+  public static final String NON_PART_TOPIC_NAME = "persistent://study/home/my-topic";
+  public static final String PART_TOPIC_NAME = "persistent://study/home/first_topic";
+
   public static final String PULSAR_URL = "pulsar://localhost:6650";
   private static final Logger log = LoggerFactory.getLogger(Main.class);
 
@@ -16,7 +18,7 @@ public class Main {
     try (PulsarClient pulsarClient = initClient()) {
 
       MessageProducer messageProducer = new MessageProducer(pulsarClient);
-      messageProducer.produce();
+      messageProducer.produce(PART_TOPIC_NAME, "My message");
 
       MessageConsumer messageConsumer = new MessageConsumer(pulsarClient);
       messageConsumer.consume();

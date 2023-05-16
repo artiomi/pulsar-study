@@ -27,6 +27,6 @@ public class MessageProducer {
     } catch (PulsarClientException e) {
       throw new RuntimeException(e);
     }
-
   }
+
 }

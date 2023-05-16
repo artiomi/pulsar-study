@@ -1,5 +1,7 @@
 package my.study;
 
+import static my.study.ClientUtils.NON_PART_TOPIC_NAME;
+
 import java.time.Instant;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.MessageId;
@@ -23,7 +25,7 @@ public class MessageReader {
 
   public void read() {
     ReaderBuilder<String> readerBuilder = pulsarClient.newReader(Schema.STRING)
-        .topic(Main.NON_PART_TOPIC_NAME)
+        .topic(NON_PART_TOPIC_NAME)
         .startMessageId(MessageId.earliest)
         .subscriptionName("my-reader");
     try (Reader<String> reader = readerBuilder.create()) {

@@ -1,7 +1,5 @@
 package my.study;
 
-import static my.study.Main.NON_PART_TOPIC_NAME;
-
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import org.apache.pulsar.client.api.Consumer;
@@ -21,23 +19,28 @@ public class MessageConsumer {
     this.pulsarClient = pulsarClient;
   }
 
-  public void consume() {
+  private static void logMessage(Message<String> message) {
+    log.info("Message consumed. Id {}, value: {}, topic: {}, time: {} ", message.getMessageId(), message.getValue(),
+        message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()));
+  }
+
+  public void consume(String topicName) {
     ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
-        .topic(NON_PART_TOPIC_NAME)
+        .topic(topicName)
         .subscriptionName("my-subscription");
     try (Consumer<String> consumer = consumerBuilder.subscribe()) {
       while (true) {
-        Message<String> message = consumer.receive(2, TimeUnit.SECONDS);
+        Message<String> message = consumer.receive(5, TimeUnit.SECONDS);
         if (message == null) {
           log.info("consumer closed!");
           return;
         }
-        log.info("Message consumed. Id {}, value: {}, topic: {}, time: {} ", message.getMessageId(), message.getValue(),
-            message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()));
+        logMessage(message);
         consumer.acknowledge(message);
       }
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
+
 }

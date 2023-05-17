@@ -1,8 +1,11 @@
 package my.study.async;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import my.study.CustomProducerInterceptor;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.Producer;
+import org.apache.pulsar.client.api.ProducerAccessMode;
 import org.apache.pulsar.client.api.ProducerBuilder;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.Schema;
@@ -45,5 +48,49 @@ public class MessageProducerAsync {
             log.info("Message produced:[{}] successfully", messageId);
           }
         });
+  }
+
+  public void producersWithDifferentAccessMode(String topicName, String message) {
+    CompletableFuture<Void> firstProducer = pulsarClient.newProducer(Schema.STRING)
+        .accessMode(ProducerAccessMode.Exclusive)
+        .intercept(new CustomProducerInterceptor())
+        .topic(topicName)
+        .createAsync()
+        .thenAcceptAsync(producer -> {
+          try {
+            TimeUnit.SECONDS.sleep(5);
+            log.info("Is producer still connected? {}", producer.isConnected());
+            producer.newMessage()
+                .value(message)
+                .key("first producer")
+                .send();
+//            producer.close(); //only when secondProducer has WaitForExclusive
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        })
+        .whenComplete((unused, throwable) -> log.info("First Done! Exceptions?", throwable));
+
+    CompletableFuture<Void> secondProducer = pulsarClient.newProducer(Schema.STRING)
+        .accessMode(ProducerAccessMode.WaitForExclusive)
+        .topic(topicName)
+        .intercept(new CustomProducerInterceptor())
+        .createAsync()
+        .thenAcceptAsync(producer -> {
+          try {
+            producer.newMessage()
+                .value(message)
+                .key("second producer")
+                .send();
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        })
+        .whenComplete((stringProducer, throwable) -> log.info("Second complete. Exceptions?", throwable));
+
+    CompletableFuture.allOf(firstProducer, secondProducer)
+        .whenComplete((unused, throwable) -> log.info("Both producer completed. Any exceptions?", throwable))
+        .join();
+
   }
 }

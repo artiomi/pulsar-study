@@ -17,6 +17,7 @@ public class Main {
 
       MessageProducer messageProducer = new MessageProducer(pulsarClient);
       messageProducer.produce(NON_PART_TOPIC_NAME, "My message");
+      messageProducer.produceToPartitioned(ClientUtils.PART_TOPIC_NAME, "My partitioned message", "routing key");
 
       MessageConsumer messageConsumer = new MessageConsumer(pulsarClient);
       messageConsumer.consume(NON_PART_TOPIC_NAME);

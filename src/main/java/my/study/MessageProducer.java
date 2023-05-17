@@ -20,13 +20,33 @@ public class MessageProducer {
 
   public void produce(String topicName, String message) {
     ProducerBuilder<String> producerBuilder = pulsarClient.newProducer(Schema.STRING)
+        .intercept(new CustomProducerInterceptor())
         .topic(topicName);
     try (Producer<String> producer = producerBuilder.create()) {
-      MessageId messageId = producer.send(message);
+      MessageId messageId = producer.newMessage()
+          .value(message)
+//          .deliverAfter(15, TimeUnit.SECONDS)
+          .send();
       log.info("Message produced:{}", messageId);
     } catch (PulsarClientException e) {
       throw new RuntimeException(e);
     }
   }
+
+  public void produceToPartitioned(String topicName, String message, String key) {
+    ProducerBuilder<String> producerBuilder = pulsarClient.newProducer(Schema.STRING)
+//        .messageRouter(new AlwaysTwoRouter())
+        .topic(topicName);
+    try (Producer<String> producer = producerBuilder.create()) {
+      MessageId messageId = producer.newMessage()
+          .value(message)
+          .key(key)
+          .send();
+      log.info("Message produced:{}", messageId);
+    } catch (PulsarClientException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
 
 }

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class ClientUtils {
 
   public static final String NON_PART_TOPIC_NAME = "persistent://study/home/my-topic";
-  public static final String PART_TOPIC_NAME = "persistent://study/home/first_topic";
+  public static final String PART_TOPIC_NAME = "persistent://study/home/my-topic-part";
 
   public static final String PULSAR_URL = "pulsar://localhost:6650";
   private static final Logger log = LoggerFactory.getLogger(ClientUtils.class);

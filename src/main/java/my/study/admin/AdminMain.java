@@ -30,8 +30,8 @@ public class AdminMain {
   }
 
   private static void partitionedTopicInfo(PulsarAdmin adminClient) throws PulsarAdminException {
-    String partitionedTopic ="persistent://study/home/first_topic";
-//    adminClient.topics().createPartitionedTopic(partitionedTopic, 5);
+    String partitionedTopic =TOPIC_NAME+"-part";
+    adminClient.topics().createPartitionedTopic(partitionedTopic, 5);
     adminClient.topics().getPartitionedTopicList("study/home")
         .forEach(t -> log.info("Partitioned topic in namespace `study/home`: {}", t));
 

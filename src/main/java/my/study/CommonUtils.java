@@ -8,15 +8,16 @@ import org.slf4j.LoggerFactory;
 
 public class CommonUtils {
 
+  private static final Logger log = LoggerFactory.getLogger(CommonUtils.class);
+
   private CommonUtils() {
   }
 
   public static void logMessage(Message<String> message) {
-    log.info("Message consumed. Id {}, value: {}, topic: {}, time: {} ", message.getMessageId(), message.getValue(),
+    log.info("Message consumed. MessageId:[{}], sequenceId:[{}], key:[{}], value:[{}], topic:[{}], publishTime:[{}] ",
+        message.getMessageId(), message.getSequenceId(), message.getKey(), message.getValue(),
         message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()));
   }
-
-  private static final Logger log = LoggerFactory.getLogger(CommonUtils.class);
 
   public static void safeSleep(int seconds) {
     try {

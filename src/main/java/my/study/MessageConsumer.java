@@ -1,7 +1,7 @@
 package my.study;
 
-import java.time.Instant;
-import java.util.Objects;
+import static my.study.CommonUtils.logMessage;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
@@ -26,11 +26,6 @@ public class MessageConsumer {
 
   public MessageConsumer(PulsarClient pulsarClient) {
     this.pulsarClient = pulsarClient;
-  }
-
-  private static void logMessage(Message<String> message) {
-    log.info("Message consumed. Id {}, value: {}, topic: {}, time: {} ", message.getMessageId(), message.getValue(),
-        message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()));
   }
 
   public void consume(String topicName) {

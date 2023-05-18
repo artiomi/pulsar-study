@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.ConsumerBuilder;
+import org.apache.pulsar.client.api.DeadLetterPolicy;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.MessageListener;
@@ -136,6 +137,60 @@ public class MessageConsumer {
         previousMessage = latestMessage.get();
       }
       log.info("consumption done.");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void consumeWithRetryTopic(String topicName) {
+    ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
+        .topic(topicName)
+        .subscriptionName("my-subscription")
+        .subscriptionType(SubscriptionType.Shared)
+        .negativeAckRedeliveryDelay(1, TimeUnit.SECONDS)
+        .enableRetry(true)
+        .deadLetterPolicy(DeadLetterPolicy.builder()
+            .retryLetterTopic(ClientUtils.RETRY_TOPIC_NAME)
+            .deadLetterTopic(ClientUtils.DL_TOPIC_NAME)
+            .initialSubscriptionName("my-dlq-subscription")
+            .maxRedeliverCount(1)
+            .build());
+    try (Consumer<String> consumer = consumerBuilder.subscribe()) {
+      while (true) {
+        Message<String> message = consumer.receive(5, TimeUnit.SECONDS);
+        if (message == null) {
+          log.info("consumer closed!");
+          return;
+        }
+        logMessage(message);
+        consumer.reconsumeLater(message, 100, TimeUnit.MICROSECONDS);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void consumeWithDLQTopic(String topicName) {
+    ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
+        .topic(topicName)
+        .subscriptionName("my-subscription")
+        .subscriptionType(SubscriptionType.Shared)
+        .negativeAckRedeliveryDelay(1, TimeUnit.SECONDS)
+        .deadLetterPolicy(DeadLetterPolicy.builder()
+            .deadLetterTopic(ClientUtils.DL_TOPIC_NAME)
+            .initialSubscriptionName("my-dlq-subscription")
+            .maxRedeliverCount(1)
+            .build());
+    try (Consumer<String> consumer = consumerBuilder.subscribe()) {
+      while (true) {
+        Message<String> message = consumer.receive(5, TimeUnit.SECONDS);
+        if (message == null) {
+          log.info("consumer closed!");
+          return;
+        }
+        logMessage(message);
+        consumer.negativeAcknowledge(message);
+      }
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

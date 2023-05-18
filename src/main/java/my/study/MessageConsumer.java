@@ -1,6 +1,7 @@
 package my.study;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
@@ -8,8 +9,10 @@ import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.ConsumerBuilder;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.MessageId;
+import org.apache.pulsar.client.api.MessageListener;
 import org.apache.pulsar.client.api.Messages;
 import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.apache.pulsar.client.impl.MultiplierRedeliveryBackoff;
@@ -108,7 +111,36 @@ public class MessageConsumer {
         return;
       }
       logMessage(message);
-      log.info(" current redelivery count: {}", message.getRedeliveryCount());//counter increases only when consumer change
+      log.info(" current redelivery count: {}",
+          message.getRedeliveryCount());//counter increases only when consumer change
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void consumeWithListener(String topicName) {
+    AtomicReference<MessageId> latestMessage = new AtomicReference<>();
+    ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
+        .topic(topicName)
+        .subscriptionName("my-listener-subscription")
+        .messageListener((MessageListener<String>) (consumer, msg) -> {
+          latestMessage.set(msg.getMessageId());
+          logMessage(msg);
+          try {
+            consumer.acknowledge(msg);
+          } catch (PulsarClientException e) {
+            log.error("Acknowledge of message:{} failed.", msg.getMessageId(), e);
+          }
+        });
+
+    try (Consumer<String> consumer = consumerBuilder.subscribe()) {
+      MessageId previousMessage = null;
+      while (latestMessage.get() == null || !latestMessage.get().equals(previousMessage)) {
+        log.info("Still consuming messages");
+        CommonUtils.safeSleep(5);
+        previousMessage = latestMessage.get();
+      }
+      log.info("consumption done.");
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

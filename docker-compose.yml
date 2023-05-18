@@ -7,7 +7,7 @@ services:
   zookeeper:
     image: apachepulsar/pulsar:latest
     container_name: zookeeper
-    restart: on-failure
+    restart: no
     networks:
       - pulsar
     volumes:
@@ -47,7 +47,7 @@ services:
   bookie:
     image: apachepulsar/pulsar:latest
     container_name: bookie
-    restart: on-failure
+    restart: no
     networks:
       - pulsar
     environment:
@@ -73,7 +73,7 @@ services:
     image: apachepulsar/pulsar:latest
     container_name: broker
     hostname: broker
-    restart: on-failure
+    restart: no
     networks:
       - pulsar
     environment:
@@ -107,3 +107,6 @@ services:
     ports:
       - "9527:9527"
       - "7750:7750"
+    restart: no
+    depends_on:
+      - broker

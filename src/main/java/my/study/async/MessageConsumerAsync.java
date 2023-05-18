@@ -1,14 +1,18 @@
 package my.study.async;
 
-import java.time.Instant;
+import static my.study.CommonUtils.logMessage;
+import static my.study.CommonUtils.safeSleep;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.pulsar.client.api.Consumer;
-import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.ConsumerBuilder;
 import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
+import org.apache.pulsar.client.api.SubscriptionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +27,6 @@ public class MessageConsumerAsync {
     this.pulsarClient = pulsarClient;
   }
 
-  private static void logMessage(Message<String> message) {
-    log.info("Message consumed. Id {}, value: {}, topic: {}, time: {} ", message.getMessageId(), message.getValue(),
-        message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()));
-  }
 
   public CompletableFuture<Void> consume(String topicName, long timeoutSec) {
     return pulsarClient.newConsumer(Schema.STRING)
@@ -89,5 +89,101 @@ public class MessageConsumerAsync {
             }
           });
     }
+  }
+
+  public CompletableFuture<Void> exclusiveSubscriptionConsumer(String topicName) throws PulsarClientException {
+    ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
+        .topic(topicName)
+        .subscriptionName("my-subscription")
+        .subscriptionType(SubscriptionType.Exclusive);
+    Consumer<String> consumerOne = consumerBuilder.subscribe();
+    Consumer<String> consumerTwo = consumerBuilder.subscribe();
+
+    CompletableFuture<Void> consumeResultFirst = consumerOne.receiveAsync()
+        .thenAcceptAsync(msg -> {
+          log.info("On message consumerOne");
+          logMessage(msg);
+          consumerOne.acknowledgeAsync(msg)
+              .whenComplete((unused, throwable) -> log.error("Message ack done. Exceptions?", throwable));
+        })
+        .thenCompose(unused -> consumerOne.closeAsync())
+        .whenComplete((unused, throwable) -> log.info("consumerOne closed. exceptions?", throwable));
+
+    CompletableFuture<Void> consumeResultSecond = consumerTwo.receiveAsync()
+        .thenAcceptAsync(msg -> {
+          log.info("On message consumerTwo");
+          logMessage(msg);
+          consumerTwo.acknowledgeAsync(msg)
+              .whenComplete((unused, throwable) -> log.error("Message ack done. Exceptions?", throwable));
+        })
+        .thenCompose(unused -> consumerTwo.closeAsync())
+        .whenComplete((unused, throwable) -> log.info("consumerTwo closed. exceptions?", throwable));
+
+    return CompletableFuture.allOf(consumeResultFirst, consumeResultSecond);
+  }
+
+  public CompletableFuture<Void> failoverSubscriptionConsumer(String topicName) throws PulsarClientException {
+    ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
+        .topic(topicName)
+        .subscriptionName("my-subscription")
+        .subscriptionType(SubscriptionType.Failover);
+    Consumer<String> consumerOne = consumerBuilder.subscribe();
+    Consumer<String> consumerTwo = consumerBuilder.subscribe();
+
+    CompletableFuture<Void> consumeResultFirst = consumerOne.receiveAsync()
+        .thenAcceptAsync(msg -> {
+//          safeSleep(1);
+          log.info("On message consumerOne");
+          logMessage(msg);
+          consumerOne.acknowledgeAsync(msg)
+              .whenComplete((unused, throwable) -> log.error("consumerOne message ack done. Exceptions?", throwable));
+        })
+        .thenCompose(unused -> consumerOne.closeAsync())
+        .whenComplete((unused, throwable) -> log.info("consumerOne closed. exceptions?", throwable));
+
+    CompletableFuture<Void> consumeResultSecond = consumerTwo.receiveAsync()
+        .thenAcceptAsync(msg -> {
+          log.info("On message consumerTwo");
+          logMessage(msg);
+          consumerTwo.acknowledgeAsync(msg)
+              .whenComplete((unused, throwable) -> log.error("consumerTwo message ack done. Exceptions?", throwable));
+        })
+        .thenCompose(unused -> consumerTwo.closeAsync())
+        .whenComplete((unused, throwable) -> log.info("consumerTwo closed. exceptions?", throwable));
+
+    return CompletableFuture.allOf(consumeResultFirst, consumeResultSecond);
+  }
+
+  public CompletableFuture<Void> sharedSubscriptionConsumer(String topicName) throws PulsarClientException {
+
+    ConsumerBuilder<String> consumerBuilder = pulsarClient.newConsumer(Schema.STRING)
+        .topic(topicName)
+        .subscriptionName("my-subscription")
+        .subscriptionType(SubscriptionType.Shared);
+    Consumer<String> consumerOne = consumerBuilder.subscribe();
+    Consumer<String> consumerTwo = consumerBuilder.subscribe();
+
+    CompletableFuture<Void> consumeResultFirst = consumerOne.receiveAsync()
+        .thenAcceptAsync(msg -> {
+          safeSleep(5);
+          log.info("On message consumerOne");
+          logMessage(msg);
+          consumerOne.acknowledgeAsync(msg)
+              .whenComplete((unused, throwable) -> log.error("consumerOne message ack done. Exceptions?", throwable));
+        })
+        .thenCompose(unused -> consumerOne.closeAsync())
+        .whenComplete((unused, throwable) -> log.info("consumerOne closed. exceptions?", throwable));
+
+    CompletableFuture<Void> consumeResultSecond = consumerTwo.receiveAsync()
+        .thenAcceptAsync(msg -> {
+          log.info("On message consumerTwo");
+          logMessage(msg);
+          consumerTwo.acknowledgeAsync(msg)
+              .whenComplete((unused, throwable) -> log.error("consumerTwo message ack done. Exceptions?", throwable));
+        })
+        .thenCompose(unused -> consumerTwo.closeAsync())
+        .whenComplete((unused, throwable) -> log.info("consumerTwo closed. exceptions?", throwable));
+
+    return CompletableFuture.allOf(consumeResultFirst, consumeResultSecond);
   }
 }

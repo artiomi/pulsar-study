@@ -39,7 +39,6 @@ public class MessageProducerAsync {
   }
 
   private CompletableFuture<MessageId> sendInternal(Producer<String> producer, String message) {
-    log.info("Attempt to publish message.");
     return producer.sendAsync(message)
         .whenComplete((messageId, throwable) -> {
           if (throwable != null) {

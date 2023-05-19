@@ -14,9 +14,10 @@ public class CommonUtils {
   }
 
   public static void logMessage(Message<String> message) {
-    log.info("Message consumed. MessageId:[{}], sequenceId:[{}], key:[{}], value:[{}], topic:[{}], publishTime:[{}] ",
+    log.info(
+        "Message consumed. MessageId:[{}], sequenceId:[{}], key:[{}], value:[{}], topic:[{}], publishTime:[{}], properties:{} ",
         message.getMessageId(), message.getSequenceId(), message.getKey(), message.getValue(),
-        message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()));
+        message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()), message.getProperties());
   }
 
   public static void safeSleep(int seconds) {

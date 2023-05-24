@@ -13,11 +13,12 @@ public class CommonUtils {
   private CommonUtils() {
   }
 
-  public static void logMessage(Message<String> message) {
+  public static void logMessage(Message<?> message) {
     log.info(
-        "Message consumed. MessageId:[{}], sequenceId:[{}], key:[{}], value:[{}], topic:[{}], publishTime:[{}], properties:{} ",
-        message.getMessageId(), message.getSequenceId(), message.getKey(), message.getValue(),
-        message.getTopicName(), Instant.ofEpochMilli(message.getPublishTime()), message.getProperties());
+        "Message consumed. MessageId:[{}], sequenceId:[{}], key:[{}], value:[{}], topic:[{}], publishTime:[{}], "
+            + "properties:{}",
+        message.getMessageId(), message.getSequenceId(), message.getKey(), message.getValue(), message.getTopicName(),
+        Instant.ofEpochMilli(message.getPublishTime()), message.getProperties());
   }
 
   public static void safeSleep(int seconds) {

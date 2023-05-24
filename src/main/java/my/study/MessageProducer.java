@@ -1,5 +1,6 @@
 package my.study;
 
+import my.study.models.User;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.ProducerBuilder;
@@ -48,5 +49,17 @@ public class MessageProducer {
     }
   }
 
+  public void produceWithSchema(String topicName, User user) {
+    ProducerBuilder<User> producerBuilder = pulsarClient.newProducer(Schema.AVRO(User.class))
+        .topic(topicName);
+    try (Producer<User> producer = producerBuilder.create()) {
+      MessageId messageId = producer.newMessage()
+          .value(user)
+          .send();
+      log.info("Message produced:{}", messageId);
+    } catch (PulsarClientException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }

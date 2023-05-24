@@ -1,5 +1,7 @@
 package my.study.admin;
 
+import static my.study.ClientUtils.USER_TOPIC_NAME;
+
 import org.apache.pulsar.client.admin.GetStatsOptions;
 import org.apache.pulsar.client.admin.PulsarAdmin;
 import org.apache.pulsar.client.admin.PulsarAdminException;
@@ -7,6 +9,7 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.common.policies.data.PartitionedTopicStats;
 import org.apache.pulsar.common.policies.data.PersistentTopicInternalStats;
 import org.apache.pulsar.common.policies.data.TopicStats;
+import org.apache.pulsar.common.schema.SchemaInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +27,21 @@ public class AdminMain {
 
 //      nonPartitionedTopicsInfo(adminClient);
       partitionedTopicInfo(adminClient);
+//      readSchemas(adminClient);
 
     }
     log.info("End.");
   }
 
+  private static void readSchemas(PulsarAdmin adminClient) throws PulsarAdminException {
+    SchemaInfo schemaInfo = adminClient.schemas().getSchemaInfo(USER_TOPIC_NAME);
+    log.info("Schema for topic:[{}], value:[{}]", USER_TOPIC_NAME, schemaInfo);
+//    adminClient.schemas().deleteSchema(USER_TOPIC_NAME);
+  }
+
   private static void partitionedTopicInfo(PulsarAdmin adminClient) throws PulsarAdminException {
-    String partitionedTopic =TOPIC_NAME+"-part";
-    adminClient.topics().createPartitionedTopic(partitionedTopic, 5);
+    String partitionedTopic = TOPIC_NAME + "-part";
+//    adminClient.topics().createPartitionedTopic(partitionedTopic, 5);
     adminClient.topics().getPartitionedTopicList("study/home")
         .forEach(t -> log.info("Partitioned topic in namespace `study/home`: {}", t));
 

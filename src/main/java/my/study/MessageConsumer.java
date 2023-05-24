@@ -4,6 +4,7 @@ import static my.study.CommonUtils.logMessage;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import my.study.models.User;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.ConsumerBuilder;
@@ -17,6 +18,7 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.client.api.SubscriptionType;
 import org.apache.pulsar.client.impl.MultiplierRedeliveryBackoff;
+import org.apache.pulsar.client.impl.schema.AvroSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,6 +192,25 @@ public class MessageConsumer {
         }
         logMessage(message);
         consumer.negativeAcknowledge(message);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void consumeWithSchema(String topicName) {
+    ConsumerBuilder<User> consumerBuilder = pulsarClient.newConsumer(AvroSchema.of(User.class))
+        .topic(topicName)
+        .subscriptionName("my-schema-subscription");
+    try (Consumer<User> consumer = consumerBuilder.subscribe()) {
+      while (true) {
+        Message<User> message = consumer.receive(10, TimeUnit.SECONDS);
+        if (message == null) {
+          log.info("consumer closed!");
+          return;
+        }
+        logMessage(message);
+        consumer.acknowledge(message);
       }
     } catch (Exception e) {
       throw new RuntimeException(e);

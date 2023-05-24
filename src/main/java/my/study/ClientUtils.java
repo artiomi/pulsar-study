@@ -9,6 +9,7 @@ public class ClientUtils {
 
   public static final String NON_PART_TOPIC_NAME = "persistent://study/home/my-topic";
   public static final String PART_TOPIC_NAME = "persistent://study/home/my-topic-part";
+  public static final String USER_TOPIC_NAME = "persistent://study/home/users-topic";
   public static final String RETRY_TOPIC_NAME = "persistent://study/home/my-retry-topic";
   public static final String DL_TOPIC_NAME = "persistent://study/home/my-dead-letter-topic";
 

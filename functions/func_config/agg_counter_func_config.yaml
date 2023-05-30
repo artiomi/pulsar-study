@@ -1,0 +1,12 @@
+className: my.study.functions.AggregationFunction
+tenant: test
+namespace: test-namespace
+name: agg-counter-func
+inputs:
+  - "persistent://test/test-namespace/counter-input"
+parallelism: 1
+autoAck: true
+subName: "agg-counter-sub"
+output: "persistent://test/test-namespace/counter-result"
+outputSchemaType: "json"
+

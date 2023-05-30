@@ -1,0 +1,10 @@
+className: my.study.functions.GreetingNativeFunction
+tenant: test
+namespace: test-namespace
+name: greeting-native-func
+inputs:
+  - "persistent://test/test-namespace/greetings-input"
+parallelism: 1
+autoAck: true
+subName: "greeting-native-sub"
+output: "persistent://test/test-namespace/test_result"

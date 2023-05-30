@@ -107,6 +107,8 @@ services:
       - "8080:8080"
     volumes:
       - ./config/functions_worker.yml:/pulsar/conf/functions_worker.yml # bk configurations for stateful functions
+      - ./functions/func_config:/pulsar/my_functions/configs
+      - ./functions/target/functions-1.0.jar:/pulsar/my_functions/functions-1.0.jar
     command: bash -c "bin/apply-config-from-env.py conf/broker.conf && exec bin/pulsar broker"
 
   manager:

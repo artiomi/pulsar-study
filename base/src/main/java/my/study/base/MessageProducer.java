@@ -1,6 +1,6 @@
-package my.study;
+package my.study.base;
 
-import my.study.models.User;
+import my.study.base.models.User;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.ProducerBuilder;

@@ -1,4 +1,4 @@
-package my.study;
+package my.study.base;
 
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;

@@ -1,13 +1,13 @@
-package my.study.async;
+package my.study.base.async;
 
-import static my.study.CommonUtils.logMessage;
-import static my.study.CommonUtils.safeSleep;
+import static my.study.base.CommonUtils.logMessage;
+import static my.study.base.CommonUtils.safeSleep;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import my.study.CommonUtils;
+import my.study.base.CommonUtils;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.ConsumerBuilder;

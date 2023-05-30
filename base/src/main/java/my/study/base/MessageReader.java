@@ -1,6 +1,6 @@
-package my.study;
+package my.study.base;
 
-import static my.study.ClientUtils.NON_PART_TOPIC_NAME;
+import static my.study.base.ClientUtils.NON_PART_TOPIC_NAME;
 
 import java.time.Instant;
 import org.apache.pulsar.client.api.Message;

@@ -1,4 +1,4 @@
-package my.study.models;
+package my.study.base.models;
 
 public class User {
 

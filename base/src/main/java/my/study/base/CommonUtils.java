@@ -1,4 +1,4 @@
-package my.study;
+package my.study.base;
 
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;

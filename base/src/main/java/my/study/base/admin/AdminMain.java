@@ -1,6 +1,7 @@
-package my.study.admin;
+package my.study.base.admin;
 
-import static my.study.ClientUtils.USER_TOPIC_NAME;
+
+import static my.study.base.ClientUtils.USER_TOPIC_NAME;
 
 import org.apache.pulsar.client.admin.GetStatsOptions;
 import org.apache.pulsar.client.admin.PulsarAdmin;

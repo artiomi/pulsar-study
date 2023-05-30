@@ -1,12 +1,10 @@
-package my.study.async;
+package my.study.base.async;
 
-import static my.study.ClientUtils.NON_PART_TOPIC_NAME;
-import static my.study.ClientUtils.PART_TOPIC_NAME;
-import static my.study.ClientUtils.initClient;
+import static my.study.base.ClientUtils.PART_TOPIC_NAME;
+import static my.study.base.ClientUtils.initClient;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.slf4j.Logger;

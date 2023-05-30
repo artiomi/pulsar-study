@@ -1,9 +1,9 @@
-package my.study.async;
+package my.study.base.async;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import my.study.CustomProducerInterceptor;
+import my.study.base.CustomProducerInterceptor;
 import org.apache.pulsar.client.api.CompressionType;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.Producer;

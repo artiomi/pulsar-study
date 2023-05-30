@@ -1,10 +1,10 @@
-package my.study;
+package my.study.base;
 
-import static my.study.ClientUtils.USER_TOPIC_NAME;
-import static my.study.ClientUtils.initClient;
+import static my.study.base.ClientUtils.USER_TOPIC_NAME;
+import static my.study.base.ClientUtils.initClient;
 
 import java.util.UUID;
-import my.study.models.User;
+import my.study.base.models.User;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,10 +1,10 @@
-package my.study;
+package my.study.base;
 
-import static my.study.CommonUtils.logMessage;
+import static my.study.base.CommonUtils.logMessage;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import my.study.models.User;
+import my.study.base.models.User;
 import org.apache.pulsar.client.api.BatchReceivePolicy;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.ConsumerBuilder;

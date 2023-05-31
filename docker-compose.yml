@@ -68,6 +68,8 @@ services:
       - PULSAR_PREFIX_storage.serve.readonly.tables=false
       - PULSAR_PREFIX_storage.cluster.controller.schedule.interval.ms=30000
       - PULSAR_PREFIX_extraServerComponents=org.apache.bookkeeper.stream.server.StreamStorageLifecycleComponent
+    ports:
+      - "4181:4181"
     depends_on:
       zookeeper:
         condition: service_healthy

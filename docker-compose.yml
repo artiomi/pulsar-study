@@ -98,7 +98,7 @@ services:
       - advertisedAddress=broker
       - advertisedListeners=external:pulsar://127.0.0.1:6650
       - PULSAR_MEM=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
-#      - functionsWorkerEnabled=true
+      - functionsWorkerEnabled=true
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -107,7 +107,9 @@ services:
     ports:
       - "6650:6650"
       - "8080:8080"
-#    volumes:
+    volumes:
+      - /d/downloads/pulsar-io-jdbc-postgres-3.0.0.nar:/pulsar/connectors/pulsar-io-jdbc-postgres-3.0.0.nar
+      - ./connector/config/:/pulsar/connectors/config/
 #      - ./config/functions_worker.yml:/pulsar/conf/functions_worker.yml # bk configurations for stateful functions
 #      - ./functions/func_config:/pulsar/my_functions/configs
 #      - ./functions/target/functions-1.0.jar:/pulsar/my_functions/functions-1.0.jar
@@ -127,3 +129,19 @@ services:
     restart: no
     depends_on:
       - broker
+
+# for connectors test use postgres
+  postgres:
+    image: postgres:12
+    container_name: postgres
+    hostname: postgres
+    networks:
+      - pulsar
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+    ports:
+      - "5432:5432"
+    restart: no
+    volumes:
+      - /D/data/postgresql:/var/lib/postgresql/data

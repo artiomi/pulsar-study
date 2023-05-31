@@ -1,0 +1,5 @@
+configs:
+  userName: "postgres"
+  password: "password"
+  jdbcUrl: "jdbc:postgresql://postgres:5432/postgres"
+  tableName: "pulsar_postgres_jdbc_sink"

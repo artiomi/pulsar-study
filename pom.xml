@@ -12,6 +12,7 @@
   <modules>
     <module>functions</module>
     <module>base</module>
+    <module>connector</module>
   </modules>
 
 </project>
